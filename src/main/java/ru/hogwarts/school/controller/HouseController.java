@@ -34,18 +34,18 @@ public class HouseController {
 
     @PutMapping()
     public ResponseEntity updateFaculty(@RequestParam Faculty faculty){
-        Faculty updateFaculty = houseService.updateFaculty(faculty.getId(), faculty);
+        Faculty updateFaculty = houseService.updateFaculty(faculty);
         return ResponseEntity.ok(updateFaculty);
     }
 
     @DeleteMapping
-    public Faculty deleteStudent(@PathVariable Long id){
-        return houseService.deleteFaculty(id);
+    public void deleteStudent(@PathVariable Long id){
+        houseService.deleteFaculty(id);
     }
 
-    @GetMapping("/houses/color/{color}")
-    public ResponseEntity<Collection<Faculty>> getFacultyByColor(@PathVariable String color){
-        Collection<Faculty> faculties = houseService.getAllFaculty()
+    @GetMapping("color")
+    public ResponseEntity<Collection<Faculty>> getFacultyByColor(@RequestParam(required = false) String color) {
+        Collection<Faculty> faculties = houseService.getByColor(color)
                 .stream()
                 .filter(f -> f.getColor().equalsIgnoreCase(color))
                 .collect(Collectors.toList());

@@ -24,8 +24,8 @@ public class StudentController {
     }
 
     @GetMapping("{facultyId}")
-    public ResponseEntity getStudentById(@PathVariable Long studentId) {
-        Student student = studentService.getStudentById(studentId);
+    public ResponseEntity getStudentById(@PathVariable Long Id) {
+        Student student = studentService.getStudentById(Id);
         if (student == null) {
             return ResponseEntity.notFound().build();
         }
@@ -39,18 +39,18 @@ public class StudentController {
 
     @PutMapping()
     public ResponseEntity updateStudent(@RequestParam Student student){
-        Student updateStudent = studentService.updateStudent(student.getId(), student);
+        Student updateStudent = studentService.updateStudent(student);
         return ResponseEntity.ok(updateStudent);
     }
 
     @DeleteMapping
-    public Student deleteStudent(@PathVariable Long id){
-        return studentService.deleteStudent(id);
+    public void deleteStudent(@PathVariable Long id){
+        studentService.deleteStudent(id);
     }
 
     @GetMapping("/students/age/{age}")
-    public ResponseEntity<Collection<Student>> getStudentByAge(@PathVariable int age) {
-        Collection<Student> students = studentService.getAllStudents()
+    public ResponseEntity<Collection<Student>> getByAge(@RequestParam(required = false) Student student, @PathVariable Integer age) {
+        Collection<Student> students = studentService.getByAge(age)
                 .stream()
                 .filter(s -> s.getAge() == age)
                 .collect(Collectors.toList());

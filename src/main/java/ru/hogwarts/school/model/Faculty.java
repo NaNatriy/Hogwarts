@@ -1,11 +1,24 @@
 package ru.hogwarts.school.model;
 
-import org.springframework.data.jpa.repository.JpaRepository;
 
+import javax.persistence.*;
+@Entity
 public class Faculty{
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
     private String color;
+
+    public Faculty() {
+
+    }
+
+    public Faculty(Long id, String name, String color) {
+        this.id = id;
+        this.name = name;
+        this.color = color;
+    }
 
     public Long getId() {
         return id;
@@ -30,4 +43,5 @@ public class Faculty{
     public void setColor(String color) {
         this.color = color;
     }
+
 }
