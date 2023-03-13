@@ -2,35 +2,68 @@ package ru.hogwarts.school.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.webjars.NotFoundException;
+import ru.hogwarts.school.dto.FacultyDTO;
+import ru.hogwarts.school.dto.StudentDTO;
 import ru.hogwarts.school.model.Faculty;
+import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.repository.HousesRepository;
+import ru.hogwarts.school.repository.StudentRepository;
 
 import java.util.*;
 
 @Service
 public class HouseService {
-    private HousesRepository facultyRepository;
-    public HouseService(HousesRepository facultyRepository) {
-        this.facultyRepository = facultyRepository;
+    private HousesRepository housesRepository;
+
+    private StudentRepository studentRepository;
+
+    public HouseService(HousesRepository housesRepository, StudentRepository studentRepository) {
+        this.housesRepository = housesRepository;
+        this.studentRepository = studentRepository;
     }
 
-    public Collection<Faculty> getAllFaculty (){
-        return facultyRepository.findAll();
+    @Transactional
+    public Faculty createFaculty (FacultyDTO facultyDTO){
+        Faculty faculty = new Faculty();
+        faculty.setName(facultyDTO.getName());
+        faculty.setColor(facultyDTO.getColor());
+        return housesRepository.save(faculty);
     }
-    public Faculty createFaculty (Faculty faculty){
-        return facultyRepository.save(faculty);
-    }
+    @Transactional
     public Faculty getFacultyById (Long facultyId){
-        return facultyRepository.findById(facultyId).get();
+        return housesRepository.findById(facultyId)
+                .orElseThrow(() -> new NotFoundException("Faculty not found"));
     }
-    public Faculty updateFaculty(Faculty faculty){
-        return facultyRepository.save(faculty);
+    @Transactional
+    public Faculty updateFaculty(Long id, FacultyDTO facultyDTO){
+        Faculty faculty = housesRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Faculty not found"));
+        faculty.setName(facultyDTO.getName());
+        faculty.setColor(facultyDTO.getColor());
+        return housesRepository.save(faculty);
     }
+    @Transactional
     public void deleteFaculty(Long facultyId){
-        facultyRepository.deleteById(facultyId);
+        housesRepository.deleteById(facultyId);
+    }
+    @Transactional
+    public Collection<Faculty> getByColor(String color) {
+        return housesRepository.findByColorIgnoreCase(color);
+    }
+    @Transactional
+    public Faculty findByName(String name){
+        return housesRepository.findByNameIgnoreCase(name);
     }
 
-    public Collection<Faculty> getByColor(String color) {
-        return facultyRepository.findByColorIgnoreCase(color);
+    public Collection<StudentDTO> getStudentsByFacultyId(Long id) {
+        Collection<Student> students = studentRepository.findByFacultyId(id);
+        Collection<StudentDTO> studentDTOs = new ArrayList<>();
+        for (Student student : students) {
+            studentDTOs.add(new StudentDTO(student.getId(), student.getName(), student.getAge(), student.getFaculty().getId()));
+        }
+        return studentDTOs;
     }
+
 }
